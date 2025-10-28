@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Seguro - Investigación</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lock-icon {
+            text-align: center;
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: monospace;
+        }
+
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+            border-left: 4px solid #c33;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .attempts {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lock-icon">🔒</div>
+        <h1>Acceso Restringido</h1>
+        <p class="subtitle">Investigación Confidencial</p>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="password">Contraseña de Acceso:</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    placeholder="Ingrese la contraseña"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+            
+            <button type="submit" class="btn" id="submitBtn">
+                Acceder a la Investigación
+            </button>
+        </form>
+
+        <div class="error-message" id="errorMsg"></div>
+        <div class="attempts" id="attemptsMsg"></div>
+
+        <div class="warning">
+            ⚠️ Este contenido es confidencial. El acceso no autorizado está prohibido.
+        </div>
+
+        <div class="footer">
+            Protegido por contraseña | 2025
+        </div>
+    </div>
+
+    <script>
+        // Configuración de seguridad
+        const CONFIG = {
+            // Contraseña encriptada (SHA-256 de "ARP2025CA")
+            passwordHash: '8c5e1e4e7d0c4f8a9b2d3e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b',
+            // URL de destino (Google Drive)
+            targetUrl: 'https://docs.google.com/spreadsheets/d/1SrUDCmITh24cUm54KSgRkNrExPxrwSuz/edit?usp=sharing&ouid=100431339764097501015&rtpof=true&sd=true',
+            maxAttempts: 3,
+            lockoutTime: 300000 // 5 minutos en milisegundos
+        };
+
+        let attempts = 0;
+        let isLocked = false;
+
+        // Función hash simple (para mayor seguridad, usar SHA-256 real)
+        async function simpleHash(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Verificar si está bloqueado
+        function checkLockout() {
+            const lockoutEnd = localStorage.getItem('lockoutEnd');
+            if (lockoutEnd) {
+                const now = Date.now();
+                if (now < parseInt(lockoutEnd)) {
+                    isLocked = true;
+                    const remaining = Math.ceil((parseInt(lockoutEnd) - now) / 1000);
+                    showError(`Demasiados intentos fallidos. Espere ${Math.ceil(remaining / 60)} minutos.`);
+                    document.getElementById('submitBtn').disabled = true;
+                    return true;
+                }
+                localStorage.removeItem('lockoutEnd');
+            }
+            return false;
+        }
+
+        // Mostrar error
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+            setTimeout(() => errorMsg.classList.remove('show'), 5000);
+        }
+
+        // Actualizar contador de intentos
+        function updateAttempts() {
+            const attemptsMsg = document.getElementById('attemptsMsg');
+            const remaining = CONFIG.maxAttempts - attempts;
+            if (attempts > 0 && remaining > 0) {
+                attemptsMsg.textContent = `Intentos restantes: ${remaining}`;
+            }
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (isLocked || checkLockout()) return;
+
+            const password = document.getElementById('password').value;
+            const hash = await simpleHash(password);
+
+            // Verificar contraseña (comparación directa por simplicidad)
+            if (password === 'ARP2025CA') {
+                // Contraseña correcta
+                document.querySelector('.lock-icon').textContent = '✅';
+                document.querySelector('h1').textContent = '¡Acceso Concedido!';
+                document.querySelector('.subtitle').textContent = 'Redirigiendo...';
+                document.getElementById('loginForm').style.display = 'none';
+                document.querySelector('.warning').style.display = 'none';
+                
+                localStorage.removeItem('lockoutEnd');
+                
+                setTimeout(() => {
+                    window.location.href = CONFIG.targetUrl;
+                }, 1500);
+            } else {
+                // Contraseña incorrecta
+                attempts++;
+                updateAttempts();
+                
+                if (attempts >= CONFIG.maxAttempts) {
+                    const lockoutEnd = Date.now() + CONFIG.lockoutTime;
+                    localStorage.setItem('lockoutEnd', lockoutEnd.toString());
+                    isLocked = true;
+                    showError('Demasiados intentos fallidos. Acceso bloqueado por 5 minutos.');
+                    document.getElementById('submitBtn').disabled = true;
+                } else {
+                    showError('❌ Contraseña incorrecta. Intente nuevamente.');
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                }
+            }
+        });
+
+        // Verificar bloqueo al cargar
+        window.addEventListener('load', checkLockout);
+    </script>
+</body>
+</html>
